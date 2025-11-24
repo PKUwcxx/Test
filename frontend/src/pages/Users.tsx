@@ -50,7 +50,7 @@ const Users: React.FC = () => {
       // 这里应该调用实际的API，现在使用模拟数据
       const mockUsers: User[] = [
         {
-          id: '1',
+          _id: '1',
           username: 'admin',
           email: 'admin@kindergarten.com',
           role: 'admin',
@@ -65,7 +65,7 @@ const Users: React.FC = () => {
           updatedAt: '2024-01-20T10:00:00Z',
         },
         {
-          id: '2',
+          _id: '2',
           username: 'teacher1',
           email: 'teacher1@kindergarten.com',
           role: 'teacher',
@@ -80,7 +80,7 @@ const Users: React.FC = () => {
           updatedAt: '2024-01-19T15:30:00Z',
         },
         {
-          id: '3',
+          _id: '3',
           username: 'parent1',
           email: 'parent1@example.com',
           role: 'parent',
@@ -129,7 +129,7 @@ const Users: React.FC = () => {
   const handleDelete = async (id: string) => {
     try {
       // 这里应该调用实际的删除API
-      setUsers(users.filter(user => user.id !== id));
+      setUsers(users.filter(user => user._id !== id));
       message.success('删除成功');
     } catch (error) {
       message.error('删除失败');
@@ -140,7 +140,7 @@ const Users: React.FC = () => {
     try {
       // 这里应该调用实际的API
       setUsers(users.map(user => 
-        user.id === id ? { ...user, isActive } : user
+        user._id === id ? { ...user, isActive } : user
       ));
       message.success(isActive ? '用户已激活' : '用户已禁用');
     } catch (error) {
@@ -255,7 +255,7 @@ const Users: React.FC = () => {
       render: (isActive, record) => (
         <Switch
           checked={isActive}
-          onChange={(checked) => handleToggleStatus(record.id, checked)}
+          onChange={(checked) => handleToggleStatus(record._id, checked)}
           checkedChildren="启用"
           unCheckedChildren="禁用"
         />
@@ -291,7 +291,7 @@ const Users: React.FC = () => {
           </Button>
           <Popconfirm
             title="确定要删除这个用户吗？"
-            onConfirm={() => handleDelete(record.id)}
+            onConfirm={() => handleDelete(record._id)}
             okText="确定"
             cancelText="取消"
           >

@@ -11,6 +11,10 @@ import Layout from './components/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Students from './pages/Students';
+import Teachers from './pages/Teachers';
+import Classes from './pages/Classes';
+import Notifications from './pages/Notifications';
+import Payments from './pages/Payments';
 import Users from './pages/Users';
 import Profile from './pages/Profile';
 
@@ -43,6 +47,30 @@ const App: React.FC = () => {
                 <Route path="students" element={
                   <ProtectedRoute roles={['admin', 'teacher']}>
                     <Students />
+                  </ProtectedRoute>
+                } />
+                
+                {/* 教师管理 - 仅管理员可访问 */}
+                <Route path="teachers" element={
+                  <ProtectedRoute roles={['admin']}>
+                    <Teachers />
+                  </ProtectedRoute>
+                } />
+                
+                {/* 班级管理 - 教师和管理员可访问 */}
+                <Route path="classes" element={
+                  <ProtectedRoute roles={['admin', 'teacher']}>
+                    <Classes />
+                  </ProtectedRoute>
+                } />
+                
+                {/* 通知管理 - 所有用户可访问 */}
+                <Route path="notifications" element={<Notifications />} />
+                
+                {/* 财务管理 - 管理员和家长可访问 */}
+                <Route path="payments" element={
+                  <ProtectedRoute roles={['admin', 'parent']}>
+                    <Payments />
                   </ProtectedRoute>
                 } />
                 

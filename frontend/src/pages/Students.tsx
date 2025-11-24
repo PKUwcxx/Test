@@ -56,7 +56,7 @@ const Students: React.FC = () => {
       // 这里应该调用实际的API，现在使用模拟数据
       const mockStudents: Student[] = [
         {
-          id: '1',
+          _id: '1',
           studentId: 'STU001',
           profile: {
             firstName: '小明',
@@ -68,7 +68,7 @@ const Students: React.FC = () => {
           parents: [
             {
               user: {
-                id: '1',
+                _id: '1',
                 username: 'parent1',
                 email: 'parent1@example.com',
                 role: 'parent',
@@ -93,20 +93,20 @@ const Students: React.FC = () => {
               phone: '13800138001',
               relationship: '父亲',
             },
-            bloodType: 'A',
+            bloodType: 'A+',
           },
           academicInfo: {
             grade: '中班',
-            status: 'active',
+            academicYear: '2024',
+            semester: 'fall',
           },
-          notes: [],
-          fullName: '张小明',
-          age: 4,
+          status: 'active',
+          notes: '',
           createdAt: '2024-01-15T00:00:00Z',
           updatedAt: '2024-01-15T00:00:00Z',
         },
         {
-          id: '2',
+          _id: '2',
           studentId: 'STU002',
           profile: {
             firstName: '小红',
@@ -118,7 +118,7 @@ const Students: React.FC = () => {
           parents: [
             {
               user: {
-                id: '2',
+                _id: '2',
                 username: 'parent2',
                 email: 'parent2@example.com',
                 role: 'parent',
@@ -143,15 +143,15 @@ const Students: React.FC = () => {
               phone: '13800138002',
               relationship: '母亲',
             },
-            bloodType: 'B',
+            bloodType: 'B+',
           },
           academicInfo: {
             grade: '小班',
-            status: 'active',
+            academicYear: '2024',
+            semester: 'fall',
           },
-          notes: [],
-          fullName: '李小红',
-          age: 3,
+          status: 'active',
+          notes: '',
           createdAt: '2024-01-15T00:00:00Z',
           updatedAt: '2024-01-15T00:00:00Z',
         },
@@ -184,11 +184,11 @@ const Students: React.FC = () => {
       address: student.profile.address,
       grade: student.academicInfo.grade,
       enrollmentDate: dayjs(student.enrollmentDate),
-      bloodType: student.healthInfo.bloodType,
-      allergies: student.healthInfo.allergies?.join(', '),
-      emergencyContactName: student.healthInfo.emergencyContact?.name,
-      emergencyContactPhone: student.healthInfo.emergencyContact?.phone,
-      emergencyContactRelationship: student.healthInfo.emergencyContact?.relationship,
+      bloodType: student.healthInfo?.bloodType,
+      allergies: student.healthInfo?.allergies?.join(', '),
+      emergencyContactName: student.healthInfo?.emergencyContact?.name,
+      emergencyContactPhone: student.healthInfo?.emergencyContact?.phone,
+      emergencyContactRelationship: student.healthInfo?.emergencyContact?.relationship,
     });
     setIsModalVisible(true);
   };
@@ -196,7 +196,7 @@ const Students: React.FC = () => {
   const handleDelete = async (id: string) => {
     try {
       // 这里应该调用实际的删除API
-      setStudents(students.filter(student => student.id !== id));
+      setStudents(students.filter(student => student._id !== id));
       message.success('删除成功');
     } catch (error) {
       message.error('删除失败');
@@ -295,9 +295,9 @@ const Students: React.FC = () => {
     },
     {
       title: '姓名',
-      dataIndex: 'fullName',
       key: 'fullName',
       width: 120,
+      render: (record: Student) => `${record.profile.firstName} ${record.profile.lastName}`,
     },
     {
       title: '性别',
@@ -366,7 +366,7 @@ const Students: React.FC = () => {
               {hasRole(['admin']) && (
                 <Popconfirm
                   title="确定要删除这个学生吗？"
-                  onConfirm={() => handleDelete(record.id)}
+                  onConfirm={() => handleDelete(record._id)}
                   okText="确定"
                   cancelText="取消"
                 >
@@ -387,7 +387,7 @@ const Students: React.FC = () => {
   ];
 
   const filteredStudents = students.filter(student =>
-    student.fullName.toLowerCase().includes(searchText.toLowerCase()) ||
+    `${student.profile.firstName} ${student.profile.lastName}`.toLowerCase().includes(searchText.toLowerCase()) ||
     student.studentId.toLowerCase().includes(searchText.toLowerCase())
   );
 
@@ -622,7 +622,7 @@ const Students: React.FC = () => {
                     {selectedStudent.profile.firstName}
                   </Avatar>
                   <Title level={4} style={{ marginTop: 8 }}>
-                    {selectedStudent.fullName}
+                    {selectedStudent.profile.firstName} {selectedStudent.profile.lastName}
                   </Title>
                 </Col>
               </Row>
@@ -630,13 +630,13 @@ const Students: React.FC = () => {
                 <Col span={12}>
                   <p><strong>学号：</strong>{selectedStudent.studentId}</p>
                   <p><strong>性别：</strong>{selectedStudent.profile.gender === 'male' ? '男' : '女'}</p>
-                  <p><strong>年龄：</strong>{selectedStudent.age}岁</p>
+                  <p><strong>年龄：</strong>{dayjs().diff(dayjs(selectedStudent.profile.dateOfBirth), 'year')}岁</p>
                 </Col>
                 <Col span={12}>
                   <p><strong>班级：</strong>{selectedStudent.academicInfo.grade}</p>
                   <p><strong>状态：</strong>
-                    <Tag color={getStatusColor(selectedStudent.academicInfo.status)}>
-                      {getStatusText(selectedStudent.academicInfo.status)}
+                    <Tag color={getStatusColor(selectedStudent.status)}>
+                      {getStatusText(selectedStudent.status)}
                     </Tag>
                   </p>
                   <p><strong>入学日期：</strong>{dayjs(selectedStudent.enrollmentDate).format('YYYY-MM-DD')}</p>
@@ -647,14 +647,14 @@ const Students: React.FC = () => {
             </Card>
 
             <Card title="健康信息" style={{ marginBottom: 16 }}>
-              <p><strong>血型：</strong>{selectedStudent.healthInfo.bloodType || '未填写'}</p>
+              <p><strong>血型：</strong>{selectedStudent.healthInfo?.bloodType || '未填写'}</p>
               <p><strong>过敏史：</strong>
-                {selectedStudent.healthInfo.allergies && selectedStudent.healthInfo.allergies.length > 0
+                {selectedStudent.healthInfo?.allergies && selectedStudent.healthInfo.allergies.length > 0
                   ? selectedStudent.healthInfo.allergies.join('、')
                   : '无'
                 }
               </p>
-              {selectedStudent.healthInfo.emergencyContact && (
+              {selectedStudent.healthInfo?.emergencyContact && (
                 <div>
                   <p><strong>紧急联系人：</strong></p>
                   <ul>
@@ -667,7 +667,7 @@ const Students: React.FC = () => {
             </Card>
 
             <Card title="家长信息">
-              {selectedStudent.parents.map((parent, index) => (
+              {selectedStudent.parents?.map((parent: any, index: number) => (
                 <div key={index} style={{ marginBottom: 16 }}>
                   <p><strong>家长 {index + 1}：</strong></p>
                   <ul>

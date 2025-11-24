@@ -218,6 +218,66 @@ const validatePaymentCreation = [
   handleValidationErrors
 ];
 
+// 教师创建验证
+const validateTeacherCreation = [
+  body('name')
+    .notEmpty()
+    .withMessage('教师姓名不能为空')
+    .isLength({ min: 2, max: 50 })
+    .withMessage('教师姓名长度应在2-50个字符之间'),
+  
+  body('employeeId')
+    .notEmpty()
+    .withMessage('工号不能为空')
+    .isLength({ min: 3, max: 20 })
+    .withMessage('工号长度应在3-20个字符之间'),
+  
+  body('gender')
+    .isIn(['男', '女'])
+    .withMessage('性别必须是男或女'),
+  
+  body('dateOfBirth')
+    .isISO8601()
+    .withMessage('出生日期格式不正确')
+    .custom((value) => {
+      const birthDate = new Date(value);
+      const today = new Date();
+      const age = today.getFullYear() - birthDate.getFullYear();
+      if (age < 18 || age > 70) {
+        throw new Error('教师年龄应在18-70岁之间');
+      }
+      return true;
+    }),
+  
+  body('phone')
+    .matches(/^1[3-9]\d{9}$/)
+    .withMessage('请输入有效的手机号码'),
+  
+  body('email')
+    .optional()
+    .isEmail()
+    .withMessage('邮箱格式不正确'),
+  
+  body('position')
+    .isIn(['园长', '副园长', '主班教师', '配班教师', '保育员', '特长教师', '后勤人员'])
+    .withMessage('职位选择不正确'),
+  
+  body('department')
+    .isIn(['教学部', '保育部', '后勤部', '行政部'])
+    .withMessage('部门选择不正确'),
+  
+  body('salary')
+    .isFloat({ min: 0 })
+    .withMessage('薪资必须是大于等于0的数字'),
+  
+  body('hireDate')
+    .optional()
+    .isISO8601()
+    .withMessage('入职日期格式不正确'),
+  
+  handleValidationErrors
+];
+
 // ID参数验证
 const validateObjectId = (paramName = 'id') => [
   param(paramName)
@@ -249,6 +309,7 @@ module.exports = {
   validateClassCreation,
   validateNotificationCreation,
   validatePaymentCreation,
+  validateTeacherCreation,
   validateObjectId,
   validatePagination,
   handleValidationErrors

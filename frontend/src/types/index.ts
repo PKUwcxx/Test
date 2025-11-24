@@ -1,6 +1,6 @@
 // 用户相关类型
 export interface User {
-  id: string;
+  _id: string;
   username: string;
   email: string;
   role: 'admin' | 'teacher' | 'parent';
@@ -19,7 +19,7 @@ export interface User {
 
 // 学生相关类型
 export interface Student {
-  id: string;
+  _id: string;
   studentId: string;
   profile: {
     firstName: string;
@@ -28,67 +28,93 @@ export interface Student {
     dateOfBirth: string;
     avatar?: string;
     address?: string;
+    emergencyContact?: {
+      name: string;
+      relationship: string;
+      phone: string;
+    };
   };
-  parents: Array<{
+  parentId?: string;
+  parents?: Array<{
     user: User;
     relationship: 'father' | 'mother' | 'guardian';
     isPrimary: boolean;
   }>;
-  class?: Class;
   enrollmentDate: string;
-  healthInfo: {
+  academicInfo: {
+    grade: '小班' | '中班' | '大班' | '学前班';
+    currentClass?: string;
+    previousClasses?: string[];
+    academicYear: string;
+    semester: 'spring' | 'fall';
+  };
+  healthInfo?: {
     allergies?: string[];
     medications?: Array<{
       name: string;
       dosage: string;
       frequency: string;
-      notes?: string;
+      notes: string;
     }>;
     emergencyContact?: {
       name: string;
       phone: string;
       relationship: string;
     };
-    bloodType?: string;
+    bloodType?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
+    medicalConditions?: string[];
+    emergencyMedicalInfo?: string;
   };
-  academicInfo: {
-    grade: string;
-    status: 'active' | 'inactive' | 'graduated' | 'transferred';
+  status: 'active' | 'inactive' | 'graduated' | 'transferred';
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// 教师相关类型
+export interface Teacher {
+  _id: string;
+  name: string;
+  employeeId: string;
+  gender: '男' | '女';
+  dateOfBirth: string;
+  age?: number;
+  phone: string;
+  email?: string;
+  address?: string;
+  avatar?: string;
+  position: '园长' | '副园长' | '主班教师' | '配班教师' | '保育员' | '特长教师' | '后勤人员';
+  department: '教学部' | '保育部' | '后勤部' | '行政部';
+  salary: number;
+  hireDate?: string;
+  workYears?: number;
+  status: '在职' | '请假' | '离职' | '退休';
+  assignedClasses?: string[];
+  qualifications?: {
+    education: string;
+    degree: string;
+    major: string;
+    graduationYear: number;
   };
-  notes: Array<{
-    date: string;
-    content: string;
-    author: User;
-    type: 'general' | 'behavior' | 'academic' | 'health';
+  certificates?: Array<{
+    name: string;
+    issuedBy: string;
+    issuedDate: string;
+    expiryDate?: string;
   }>;
-  fullName: string;
-  age: number;
+  notes?: string;
   createdAt: string;
   updatedAt: string;
 }
 
 // 班级相关类型
 export interface Class {
-  id: string;
+  _id: string;
   name: string;
   grade: '小班' | '中班' | '大班' | '学前班';
   capacity: number;
-  currentEnrollment: number;
-  teachers: Array<{
-    user: User;
-    role: 'head_teacher' | 'assistant_teacher' | 'subject_teacher';
-    subjects?: string[];
-  }>;
-  schedule: Array<{
-    day: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday';
-    periods: Array<{
-      startTime: string;
-      endTime: string;
-      subject: string;
-      teacher?: User;
-      room?: string;
-    }>;
-  }>;
+  students: Student[] | string[];
+  teachers: Teacher[] | string[];
   classroom: {
     number: string;
     building?: string;
@@ -97,86 +123,67 @@ export interface Class {
   };
   academicYear: string;
   semester: 'spring' | 'fall';
-  isActive: boolean;
+  schedule?: Array<{
+    day: string;
+    startTime: string;
+    endTime: string;
+    subject?: string;
+    teacher?: string;
+  }>;
+  status: 'active' | 'inactive' | 'archived';
   description?: string;
-  isFull: boolean;
-  availableSpots: number;
-  headTeacher?: {
-    user: User;
-    role: string;
-  };
   createdAt: string;
   updatedAt: string;
 }
 
 // 通知相关类型
 export interface Notification {
-  id: string;
+  _id: string;
   title: string;
   content: string;
   type: 'general' | 'urgent' | 'event' | 'academic' | 'health' | 'payment';
   priority: 'low' | 'medium' | 'high';
-  author: User;
+  author: {
+    _id: string;
+    username: string;
+    profile: {
+      firstName: string;
+      lastName: string;
+    };
+  };
   recipients: {
     type: 'all' | 'role' | 'class' | 'individual';
-    roles?: string[];
-    classes?: Class[];
-    users?: User[];
+    values: string[];
   };
+  status: 'draft' | 'published' | 'archived';
+  readBy: string[];
   attachments?: Array<{
-    filename: string;
-    originalName: string;
-    mimetype: string;
-    size: number;
+    name: string;
     url: string;
+    type: string;
+    size: number;
   }>;
-  publishDate: string;
+  scheduledDate?: string;
   expiryDate?: string;
-  isPublished: boolean;
-  readBy: Array<{
-    user: User;
-    readAt: string;
-  }>;
-  statistics: {
-    totalRecipients: number;
-    readCount: number;
-  };
-  isExpired: boolean;
-  readRate: string;
   createdAt: string;
   updatedAt: string;
 }
 
 // 支付相关类型
 export interface Payment {
-  id: string;
+  _id: string;
   student: Student;
-  payer: User;
   type: 'tuition' | 'meal' | 'activity' | 'material' | 'transportation' | 'other';
   description: string;
   amount: number;
-  currency: string;
   dueDate: string;
-  status: 'pending' | 'paid' | 'overdue' | 'cancelled' | 'refunded';
   paymentDate?: string;
-  paymentMethod?: 'cash' | 'bank_transfer' | 'credit_card' | 'alipay' | 'wechat_pay' | 'other';
+  paymentMethod?: string;
   transactionId?: string;
-  receipt?: {
-    number: string;
-    url?: string;
-  };
+  status: 'pending' | 'paid' | 'overdue' | 'cancelled';
   academicYear: string;
   semester: 'spring' | 'fall';
   notes?: string;
-  processedBy?: User;
-  refund?: {
-    amount: number;
-    reason: string;
-    date: string;
-    processedBy: User;
-  };
-  isOverdue: boolean;
-  overdueDays: number;
   createdAt: string;
   updatedAt: string;
 }

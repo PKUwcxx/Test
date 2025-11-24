@@ -12,6 +12,10 @@ const { errorHandler, notFoundHandler } = require('./src/middleware/errorHandler
 const authRoutes = require('./src/routes/auth');
 const userRoutes = require('./src/routes/users');
 const studentRoutes = require('./src/routes/students');
+const teacherRoutes = require('./src/routes/teachers');
+const classRoutes = require('./src/routes/classes');
+const notificationRoutes = require('./src/routes/notifications');
+const paymentRoutes = require('./src/routes/payments');
 
 const app = express();
 
@@ -32,7 +36,12 @@ app.use(helmet({
 }));
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:12000',
+    'https://work-1-ycusvpnpklsxrlpg.prod-runtime.all-hands.dev',
+    'https://work-2-ycusvpnpklsxrlpg.prod-runtime.all-hands.dev'
+  ],
   credentials: true
 }));
 
@@ -47,6 +56,10 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/students', studentRoutes);
+app.use('/api/teachers', teacherRoutes);
+app.use('/api/classes', classRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // 健康检查
 app.get('/api/health', (req, res) => {

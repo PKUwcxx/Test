@@ -20,6 +20,9 @@ import {
   MenuUnfoldOutlined,
   BellOutlined,
   BookOutlined,
+  UsergroupAddOutlined,
+  NotificationOutlined,
+  DollarOutlined,
 } from '@ant-design/icons';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -77,9 +80,9 @@ const Layout: React.FC = () => {
 
     if (hasRole(['admin'])) {
       items.push({
-        key: '/users',
-        icon: <UserOutlined />,
-        label: '用户管理',
+        key: '/teachers',
+        icon: <UsergroupAddOutlined />,
+        label: '教师管理',
       });
     }
 
@@ -88,6 +91,30 @@ const Layout: React.FC = () => {
         key: '/classes',
         icon: <BookOutlined />,
         label: '班级管理',
+      });
+    }
+
+    // 通知管理 - 所有用户可访问
+    items.push({
+      key: '/notifications',
+      icon: <NotificationOutlined />,
+      label: '通知管理',
+    });
+
+    // 财务管理 - 管理员和家长可访问
+    if (hasRole(['admin', 'parent'])) {
+      items.push({
+        key: '/payments',
+        icon: <DollarOutlined />,
+        label: '财务管理',
+      });
+    }
+
+    if (hasRole(['admin'])) {
+      items.push({
+        key: '/users',
+        icon: <UserOutlined />,
+        label: '用户管理',
       });
     }
 
